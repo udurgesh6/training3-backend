@@ -2,7 +2,7 @@ const express = require("express");
 const mysql = require("mysql2");
 const PORT = 8080;
 const cors = require("cors");
-
+const bodyParser = require("body-parser");
 require("dotenv").config();
 
 const con = mysql.createConnection({
@@ -18,14 +18,25 @@ app.use(
     origin: "http://localhost:3000",
   })
 );
+app.use(bodyParser.json());
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
 
 app.get("/employees", (req, res) => {
-  console.log(req.query);
   con.query(`SELECT * FROM happyagility.Testing`, function (err, result) {
-    if (err) res.send("Error Message");
+    if (err) res.send(err);
     if (result) res.send(result);
   });
+});
+
+app.post("/employees/add", (req, res) => {
+  console.log(req.body);
+  con.query(
+    `INSERT INTO happyagility.Testing (testing_id, name, age) VALUES ('${req.body.testing_id}','${req.body.name}', ${req.body.age})`,
+    function (err, result) {
+      if (err) res.send(err);
+      if (result) res.send(result);
+    }
+  );
 });
